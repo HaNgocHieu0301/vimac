@@ -54,10 +54,10 @@ class ScrollModeViewController: ModeViewController {
 
     private func observeScrollAreas() -> Disposable {
         fetchScrollAreas()
-            .observeOn(MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
             .subscribe(onSuccess: { [weak self] scrollAreas in
                 self?.setActiveState(scrollAreas: scrollAreas)
-            }, onError: { [weak self] _ in
+            }, onFailure: { [weak self] _ in
                 self?.delegate?.deactivate()
             })
     }

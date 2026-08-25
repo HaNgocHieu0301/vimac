@@ -171,7 +171,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         _ = self.compositeDisposable.insert(
             AXManualAccessibilityDisabled
-                .observeOn(axWorker)
+                .observe(on: axWorker)
                 .subscribe(onNext: {
                     AXManualAccessibilityActivator.deactivateAll()
                 })
@@ -179,7 +179,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         _ = self.compositeDisposable.insert(
             frontmostAppChange.onlyWhen(isAXManualAccessibilityEnabled)
-                .observeOn(axWorker)
+                .observe(on: axWorker)
                 .subscribe(onNext: { (_, currentApp) in
                     if let currentApp = currentApp {
                         AXManualAccessibilityActivator.activate(currentApp)
@@ -194,7 +194,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         _ = self.compositeDisposable.insert(
             AXEnhancedUserInterfaceDisabled
-                .observeOn(axWorker)
+                .observe(on: axWorker)
                 .subscribe(onNext: {
                     AXEnhancedUserInterfaceActivator.deactivateAll()
                 })
@@ -202,7 +202,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         _ = self.compositeDisposable.insert(
             frontmostAppChange.onlyWhen(isAXEnhancedUserInterfaceEnabled)
-                .observeOn(axWorker)
+                .observe(on: axWorker)
                 .subscribe(onNext: { (_, currentApp) in
                     if let currentApp = currentApp {
                         AXEnhancedUserInterfaceActivator.activate(currentApp)
@@ -213,21 +213,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func setupWindowEventAndShortcutObservables() {
         _ = self.compositeDisposable.insert(focusedWindowDisturbedObservable
-            .observeOn(MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { notification in
                 self.modeCoordinator.deactivate()
             })
         )
         
         _ = self.compositeDisposable.insert(windowObservable
-            .observeOn(MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { windowOptional in
                 self.modeCoordinator.deactivate()
             })
         )
 
         _ = self.compositeDisposable.insert(hintModeShortcutObservable
-            .observeOn(MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
 
@@ -243,7 +243,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
         
         _ = self.compositeDisposable.insert(scrollModeShortcutObservable
-            .observeOn(MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 

@@ -281,19 +281,19 @@ class HintModeController: ModeController {
     private func queryHints(onSuccess: @escaping ([Hint]) -> Void, onError: @escaping (Error) -> Void) {
         HintModeQueryService.init(app: app, window: window, hintCharacters: hintCharacters).perform()
             .toArray()
-            .observeOn(MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
             .do(onSuccess: { _ in self.logQueryTime() })
             .do(onError: { e in self.logError(e) })
             .subscribe(
                 onSuccess: { onSuccess($0) },
-                onError: { onError($0) }
+                onFailure: { onError($0) }
             )
             .disposed(by: disposeBag)
     }
 
     private func listenForKeyPress(onEvent: @escaping (NSEvent) -> Void) {
         NSEvent.localEventMonitor(matching: .keyDown)
-            .observeOn(MainScheduler.instance)
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { event in
                 onEvent(event)
             })

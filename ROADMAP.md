@@ -102,10 +102,12 @@ trên UI native. Đã verify thực tế bằng cách mở app và dùng thử H
   `.macOS(.v13)`) — từ 10.15 (Phase 1) lên thẳng 13.0, không dừng ở mức trung gian.
 - ✅ Warning `@_functionBuilder` (từ pod `Preferences` cũ) **tự động biến mất** sau khi chuyển sang
   package `Settings` mới (code hiện đại, dùng `@resultBuilder` đúng chuẩn) — không cần sửa gì thêm.
-- ⬜ **Phát sinh, chưa làm**: RxSwift 6 deprecate `observeOn`/`subscribe(onSuccess:onError:...)` để
-  đổi tên thành `observe(on:)`/`subscribe(onSuccess:onFailure:...)` — build vẫn chạy tốt (chỉ là
-  warning), nhưng còn ~15 chỗ rải rác (`AppDelegate.swift`, `HintModeController.swift`,
-  `ScrollModeViewController.swift`...) nên dọn khi có dịp, không khẩn cấp.
+- ✅ **Dọn 13 warning deprecation của RxSwift 6**: `observeOn(...)` → `observe(on: ...)` (11 chỗ,
+  trong `AppDelegate.swift`, `HintModeController.swift`, `ScrollModeViewController.swift`) và
+  `subscribe(onSuccess:onError:)` → `subscribe(onSuccess:onFailure:)` (2 chỗ, trong
+  `HintModeController.swift` và `ScrollModeViewController.swift` — chỉ đổi ở lệnh `.subscribe(...)`,
+  **không đụng** `.do(onSuccess:onError:)` vì đó là operator khác, RxSwift 6 không rename tham số
+  của nó). Build hết sạch warning liên quan RxSwift, verify lại bằng cách build + chạy app.
 
 ## Phase 3 — Kiểm tra lại hành vi Accessibility trên macOS/trình duyệt hiện tại
 
