@@ -6,7 +6,6 @@
 
 import Cocoa
 import AXSwift
-import MASShortcut
 import RxSwift
 
 class Utils: NSObject {

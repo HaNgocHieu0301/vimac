@@ -8,15 +8,16 @@
 
 import Cocoa
 import Preferences
+import KeyboardShortcuts
 
 class BindingsPreferenceViewController: NSViewController, PreferencePane, NSTextFieldDelegate {
     let preferencePaneIdentifier = Preferences.PaneIdentifier.bindings
     let preferencePaneTitle = "Bindings"
     let toolbarItemIcon: NSImage
-    
+
     private var grid: NSGridView!
-    private var hintModeShortcut: MASShortcutView!
-    private var scrollModeShortcut: MASShortcutView!
+    private var hintModeShortcut: KeyboardShortcuts.RecorderCocoa!
+    private var scrollModeShortcut: KeyboardShortcuts.RecorderCocoa!
 
     private var holdSpaceToActivateHintModeCheckbox: NSButton!
     private var hintModeKeySequenceEnabledCheckbox: NSButton!
@@ -76,13 +77,11 @@ class BindingsPreferenceViewController: NSViewController, PreferencePane, NSText
         grid.addRow(with: [shortcutActivationLabel])
         
         let hintModeShortcutLabel = NSTextField(labelWithString: "Hint Mode Shortcut:")
-        hintModeShortcut = MASShortcutView()
-        hintModeShortcut.associatedUserDefaultsKey = KeyboardShortcuts.shared.hintModeShortcutKey
+        hintModeShortcut = KeyboardShortcuts.RecorderCocoa(for: .hintMode)
         grid.addRow(with: [hintModeShortcutLabel, hintModeShortcut])
-        
+
         let scrollModeShortcutLabel = NSTextField(labelWithString: "Scroll Mode Shortcut:")
-        scrollModeShortcut = MASShortcutView()
-        scrollModeShortcut.associatedUserDefaultsKey = KeyboardShortcuts.shared.scrollModeShortcutKey
+        scrollModeShortcut = KeyboardShortcuts.RecorderCocoa(for: .scrollMode)
         grid.addRow(with: [scrollModeShortcutLabel, scrollModeShortcut])
         
         grid.addRow(with: [])

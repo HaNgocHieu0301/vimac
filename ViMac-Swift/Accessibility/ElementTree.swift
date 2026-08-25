@@ -87,13 +87,12 @@ class ElementTree {
         if element.role == "AXWindow" || element.role == "AXScrollArea" {
             return false
         }
-        
+
         return isActionable(element) || isRowWithoutHintableChildren(element)
     }
     
     private func isActionable(_ element: Element) -> Bool {
         let ignoredActions: Set = [
-            "AXShowMenu",
             "AXScrollToVisible",
             "AXShowDefaultUI",
             "AXShowAlternateUI"

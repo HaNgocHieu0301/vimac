@@ -8,45 +8,30 @@
 
 import Cocoa
 import RxSwift
+import KeyboardShortcuts
 
-class KeyboardShortcuts {
-    static let shared = KeyboardShortcuts.init()
-    
-    let hintModeShortcutKey = "HintModeShortcut"
-    let scrollModeShortcutKey = "ScrollModeShortcut"
-    let defaultHintShortcut = MASShortcut.init(keyCode: kVK_ANSI_F, modifierFlags: [.control])
-    let defaultScrollShortcut = MASShortcut.init(keyCode: kVK_ANSI_J, modifierFlags: [.control])
-    
-    func registerDefaults() {
-        let hintModeTempView = MASShortcutView.init()
-        hintModeTempView.associatedUserDefaultsKey = self.hintModeShortcutKey
-        if hintModeTempView.shortcutValue == nil {
-            hintModeTempView.shortcutValue = self.defaultHintShortcut
-        }
-        
-        let scrollModeTempView = MASShortcutView.init()
-        scrollModeTempView.associatedUserDefaultsKey = self.scrollModeShortcutKey
-        if scrollModeTempView.shortcutValue == nil {
-            scrollModeTempView.shortcutValue = self.defaultScrollShortcut
-        }
-    }
+extension KeyboardShortcuts.Name {
+    static let hintMode = Self("hintMode", default: .init(.f, modifiers: [.control]))
+    static let scrollMode = Self("scrollMode", default: .init(.j, modifiers: [.control]))
+}
+
+class VimacShortcuts {
+    static let shared = VimacShortcuts.init()
 
     func hintModeShortcutActivation() -> Observable<Void> {
         Observable.create { observer in
-            MASShortcutBinder.shared()
-                .bindShortcut(withDefaultsKey: self.hintModeShortcutKey, toAction: {
-                    observer.onNext(Void())
-                })
+            KeyboardShortcuts.onKeyUp(for: .hintMode) {
+                observer.onNext(Void())
+            }
             return Disposables.create()
         }
     }
-    
+
     func scrollModeShortcutActivation() -> Observable<Void> {
         Observable.create { observer in
-            MASShortcutBinder.shared()
-                .bindShortcut(withDefaultsKey: self.scrollModeShortcutKey, toAction: {
-                    observer.onNext(Void())
-                })
+            KeyboardShortcuts.onKeyUp(for: .scrollMode) {
+                observer.onNext(Void())
+            }
             return Disposables.create()
         }
     }

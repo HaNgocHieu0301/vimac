@@ -1,4 +1,5 @@
 import Cocoa
+import Carbon.HIToolbox
 import RxSwift
 
 struct ScrollKeyConfig {

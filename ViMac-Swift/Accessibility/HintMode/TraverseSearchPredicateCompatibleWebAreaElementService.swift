@@ -89,20 +89,12 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
             "AXRadioGroupSearchKey",
             "AXTextFieldSearchKey"
         ]
-        
-        var multiSearchKeyQuery = query
-        multiSearchKeyQuery["AXSearchKey"] = searchKeys
-        
-        let multiSearchKeyQueryMatches: Int = (try UIElement(element.rawElement).parameterizedAttribute("AXUIElementCountForSearchPredicate", param: multiSearchKeyQuery)) ?? 0
-        
-        if multiSearchKeyQueryMatches > 0 {
-            let rawElements: [AXUIElement]? = try UIElement(element.rawElement).parameterizedAttribute("AXUIElementsForSearchPredicate", param: multiSearchKeyQuery)
-            let elements = rawElements?
-                .map({ Element.initialize(rawElement: $0) })
-                .compactMap({ $0 })
-            return elements
-        }
-        
+
+        // NOTE: previously this attempted a single combined query with AXSearchKey set to the full
+        // array of search keys, only falling back to per-key queries when it matched zero elements.
+        // Chromium's combined multi-key search can silently omit some matching elements while still
+        // returning a non-zero count (see comment above), so that fast path could drop real,
+        // clickable elements at random. Always doing the per-key union is slower but correct.
         var elements: [AXUIElement] = []
         for searchKey in searchKeys {
             var singleSearchKeyQuery = query
@@ -111,9 +103,9 @@ class TraverseSearchPredicateCompatibleWebAreaElementService : TraverseElementSe
                 elements.append(contentsOf: rawElements)
             }
         }
-        
+
         let uniqueElements = elements.uniqued()
-        
+
         return uniqueElements
             .map({ Element.initialize(rawElement: $0) })
             .compactMap({ $0 })
