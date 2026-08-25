@@ -7,12 +7,12 @@
 //
 
 import Cocoa
-import Preferences
+import Settings
 import KeyboardShortcuts
 
-class BindingsPreferenceViewController: NSViewController, PreferencePane, NSTextFieldDelegate {
-    let preferencePaneIdentifier = Preferences.PaneIdentifier.bindings
-    let preferencePaneTitle = "Bindings"
+class BindingsPreferenceViewController: NSViewController, SettingsPane, NSTextFieldDelegate {
+    let paneIdentifier = Settings.PaneIdentifier.bindings
+    let paneTitle = "Bindings"
     let toolbarItemIcon: NSImage
 
     private var grid: NSGridView!

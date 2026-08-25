@@ -1,9 +1,9 @@
 import Cocoa
-import Preferences
+import Settings
 
-final class HintModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
-    let preferencePaneIdentifier = Preferences.PaneIdentifier.hintMode
-    let preferencePaneTitle = "Hint Mode"
+final class HintModePreferenceViewController: NSViewController, NSTextFieldDelegate, SettingsPane {
+    let paneIdentifier = Settings.PaneIdentifier.hintMode
+    let paneTitle = "Hint Mode"
     let toolbarItemIcon: NSImage
     
     private var grid: NSGridView!

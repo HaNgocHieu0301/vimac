@@ -7,11 +7,11 @@
 //
 
 import Cocoa
-import Preferences
+import Settings
 
-class AboutPreferencesViewController: NSViewController, PreferencePane {
-    let preferencePaneIdentifier = Preferences.PaneIdentifier.about
-    let preferencePaneTitle = "About"
+class AboutPreferencesViewController: NSViewController, SettingsPane {
+    let paneIdentifier = Settings.PaneIdentifier.about
+    let paneTitle = "About"
     let toolbarItemIcon: NSImage
     
     init() {

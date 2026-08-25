@@ -44,33 +44,26 @@ HJKL keys can be used to scroll within the scroll area.
 
 ## Building
 
+All dependencies are managed via Swift Package Manager, so no separate dependency install step is
+needed — just open the workspace and build:
+
 ```
-pod install
-carthage build
 open Vimac.xcworkspace
 ```
 
-Modify the Signing and Capabilities to the following (note the `Disable Library Validation` option):
+Xcode will resolve and fetch the Swift packages automatically on first open/build. Requires Xcode
+15+ and macOS 13+ (see `ROADMAP.md` for why).
 
-![](docs/remove_signing.png)
+Set the **Team** in Signing & Capabilities to your own Apple ID/Team (the checked-in project is
+configured for the maintainer's personal team and won't have a matching signing certificate on
+your machine).
 
-Add Vimac and Xcode (for running AppleScript) to the list of Accessibility apps under **System Preferences > Security & Privacy > Accessibility**:
-
-![](docs/vimac_xcode_accessibility.png)
-
-Keep System Preferences open under this section during development with the settings unlocked. This is because the `grant-accessibility-permission-dev.scpt` AppleScript is scheduled to run after each build to re-grant Accessibility permissions.
-
-The AppleScript simply checks and unchecks Vimac to re-grant permissions which are lost after a cleanbuild.
-
-Build Vimac now! You may have to build it several times as the AppleScript may not run well the first time.
-
-At this point running `git status` would bring up:
-
-```
-modified:   ViMac-Swift/ViMac_Swift.entitlements
-modified:   Vimac.xcodeproj/project.pbxproj
-modified:   grant-accessibility-permission-dev.scpt
-```
+Add Vimac (and Xcode, if you want AppleScript-driven permission granting) to **System Settings →
+Privacy & Security → Accessibility**. There is no automatic re-grant step anymore — the old
+`grant-accessibility-permission-dev.scpt`, which drove the classic "System Preferences" UI via
+AppleScript, stopped working once Apple redesigned that pane into System Settings (macOS Ventura+);
+its build phase is now non-fatal but does nothing useful. Grant the permission manually whenever it
+gets reset (e.g. after a clean build, or the first time you sign the app with a new certificate).
 
 Avoid committing them.
 

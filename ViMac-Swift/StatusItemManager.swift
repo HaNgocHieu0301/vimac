@@ -7,14 +7,14 @@
 //
 
 import Cocoa
-import Preferences
+import Settings
 
 class StatusItemManager: NSObject {
     let menu: NSMenu
     let statusItem: NSStatusItem
-    let preferencesWindowController: PreferencesWindowController
+    let preferencesWindowController: SettingsWindowController
     
-    init(preferencesWindowController: PreferencesWindowController) {
+    init(preferencesWindowController: SettingsWindowController) {
         self.menu = NSMenu()
         self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         self.statusItem.button!.image = NSImage(named: "StatusBarButtonImage")
@@ -48,7 +48,7 @@ extension StatusItemManager : NSMenuDelegate {
     }
     
     @objc func aboutClick() {
-        preferencesWindowController.show(preferencePane: .about)
+        preferencesWindowController.show(pane: .about)
     }
 
     @objc func manualClick() {

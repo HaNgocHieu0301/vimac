@@ -1,6 +1,6 @@
-import Preferences
+import Settings
 
-extension Preferences.PaneIdentifier {
+extension Settings.PaneIdentifier {
     static let general = Self("general")
     static let bindings = Self("bindings")
     static let hintMode = Self("hint_mode")

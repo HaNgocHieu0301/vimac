@@ -1,11 +1,11 @@
 import Cocoa
 import RxSwift
-import Preferences
+import Settings
 import LaunchAtLogin
 
-final class GeneralPreferenceViewController: NSViewController, PreferencePane {
-    let preferencePaneIdentifier = Preferences.PaneIdentifier.general
-    let preferencePaneTitle = "General"
+final class GeneralPreferenceViewController: NSViewController, SettingsPane {
+    let paneIdentifier = Settings.PaneIdentifier.general
+    let paneTitle = "General"
     let toolbarItemIcon: NSImage
     
     private var grid: NSGridView!

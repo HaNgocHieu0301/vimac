@@ -91,7 +91,7 @@ class ScrollModeViewController: ModeViewController {
 
                     observer(.success(scrollAreas))
                 } catch {
-                    observer(.error(error))
+                    observer(.failure(error))
                 }
             }
             thread.start()

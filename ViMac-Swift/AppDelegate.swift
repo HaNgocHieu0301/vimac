@@ -10,7 +10,7 @@ import Cocoa
 import AXSwift
 import RxSwift
 import LaunchAtLogin
-import Preferences
+import Settings
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -27,7 +27,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     var modeCoordinator: ModeCoordinator!
     let overlayWindowController: OverlayWindowController
-    var preferencesWindowController: PreferencesWindowController!
+    var preferencesWindowController: SettingsWindowController!
     var statusItemManager: StatusItemManager!
     
     let frontmostAppService = FrontmostApplicationService.init()
@@ -90,8 +90,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
     func setupPreferences() {
         if self.preferencesWindowController == nil {
-            self.preferencesWindowController = PreferencesWindowController(
-                preferencePanes: [
+            self.preferencesWindowController = SettingsWindowController(
+                panes: [
                     GeneralPreferenceViewController(),
                     BindingsPreferenceViewController(),
                     HintModePreferenceViewController(),

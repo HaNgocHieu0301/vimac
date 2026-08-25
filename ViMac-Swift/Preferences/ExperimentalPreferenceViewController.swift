@@ -7,11 +7,11 @@
 //
 
 import Cocoa
-import Preferences
+import Settings
 
-class ExperimentalPreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
-    let preferencePaneIdentifier = Preferences.PaneIdentifier.experimental
-    let preferencePaneTitle = "Experimental"
+class ExperimentalPreferenceViewController: NSViewController, NSTextFieldDelegate, SettingsPane {
+    let paneIdentifier = Settings.PaneIdentifier.experimental
+    let paneTitle = "Experimental"
     let toolbarItemIcon: NSImage
     
     private var grid: NSGridView!

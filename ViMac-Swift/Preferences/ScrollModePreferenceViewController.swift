@@ -1,9 +1,9 @@
 import Cocoa
-import Preferences
+import Settings
 
-final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDelegate, PreferencePane {
-    let preferencePaneIdentifier = Preferences.PaneIdentifier.scrollMode
-    let preferencePaneTitle = "Scroll Mode"
+final class ScrollModePreferenceViewController: NSViewController, NSTextFieldDelegate, SettingsPane {
+    let paneIdentifier = Settings.PaneIdentifier.scrollMode
+    let paneTitle = "Scroll Mode"
     let toolbarItemIcon: NSImage
     
     private var grid: NSGridView!

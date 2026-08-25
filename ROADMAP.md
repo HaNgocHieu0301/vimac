@@ -69,17 +69,43 @@ trên UI native. Đã verify thực tế bằng cách mở app và dùng thử H
   `LaunchAtLogin-Modern` yêu cầu `MACOSX_DEPLOYMENT_TARGET` 13+, một quyết định lớn hơn nên gộp
   chung với việc nâng deployment target ở Phase 2 thay vì làm rời rạc từng phần.
 
-## Phase 2 — Hiện đại hoá dependency & build
+## Phase 2 — Hiện đại hoá dependency & build (✅ HOÀN THÀNH)
 
-- ⬜ Gộp toàn bộ dependency về Swift Package Manager, bỏ hẳn CocoaPods (`Podfile`, `Pods/`) và
-  Carthage (`Cartfile`, `Carthage/`). `KeyboardShortcuts` đã là SPM (xong ở Phase 1) — còn lại
-  `AXSwift`, `RxSwift`/`RxCocoa`, `Preferences` (CocoaPods) và `LaunchAtLogin` (Carthage).
-- ⬜ Nâng `MACOSX_DEPLOYMENT_TARGET` lên mức hợp lý hơn nữa cho máy cá nhân (vd. 13/14). Đã nâng một
-  bước nhỏ từ 10.14 → **10.15** ở Phase 1 (yêu cầu tối thiểu của `KeyboardShortcuts`); việc nâng lên
-  13+ (để dùng `LaunchAtLogin-Modern`/`SMAppService`) là quyết định lớn hơn, làm cùng lúc với việc
-  gỡ Carthage.
-- ⬜ Dọn cảnh báo build còn sót (vd. `@_functionBuilder` đã đổi tên thành `@resultBuilder` trong pod
-  `Preferences` — chỉ là warning, không chặn build).
+- ✅ **Gộp toàn bộ dependency về Swift Package Manager, bỏ hẳn CocoaPods và Carthage**:
+  - Thêm SPM package cho `AXSwift` (tmandry/AXSwift), `RxSwift` + `RxCocoa` (ReactiveX/RxSwift
+    v6.10.2 — **nhảy từ major 5 lên 6**), và `Settings` (sindresorhus/Settings v3.1.2 — bản kế
+    nhiệm chính thức của `Preferences`, đổi tên theo Apple đổi "System Preferences" →
+    "System Settings"), bằng cách chỉnh `project.pbxproj` qua gem `xcodeproj` (như cách làm với
+    `KeyboardShortcuts` ở Phase 1).
+  - Chạy `pod deintegrate`, xóa `Podfile`, `Podfile.lock`, `Pods/` — không còn CocoaPods trong repo.
+  - Đổi tên API theo package `Settings` mới trên 9 file: `import Preferences` → `import Settings`,
+    `PreferencePane` → `SettingsPane`, `PreferencesWindowController` → `SettingsWindowController`,
+    `preferencePaneIdentifier`/`preferencePaneTitle` → `paneIdentifier`/`paneTitle`,
+    `Preferences.PaneIdentifier` → `Settings.PaneIdentifier`, `preferencePanes:` → `panes:`,
+    `.show(preferencePane:` → `.show(pane:`. **Lưu ý khi tự làm lại**: sed trên macOS dùng BSD sed,
+    **không hỗ trợ `\b` (word boundary)** như GNU sed — 2 pattern dùng `\b` bị bỏ qua âm thầm
+    (không báo lỗi), phải phát hiện qua diff rồi sửa lại bằng literal match.
+  - **RxSwift 5 → 6 có 1 breaking change chạm tới code**: `SingleEvent` đổi từ enum riêng
+    (`.success`/`.error`) sang `Result<Element, Error>` chuẩn (`.success`/`.failure`) — sửa
+    `observer(.error(error))` → `observer(.failure(error))` trong `ScrollModeViewController.swift`.
+  - Migrate `LaunchAtLogin` (Carthage v4, cơ chế login-item cũ qua helper app riêng +
+    `SMLoginItemSetEnabled`) sang **`LaunchAtLogin-Modern`** (SPM, dùng `SMAppService.mainApp`,
+    không cần helper app/entitlement riêng nữa — API `LaunchAtLogin.isEnabled` giữ nguyên, không
+    cần sửa code gọi). Gỡ bằng script: file reference `LaunchAtLogin.framework`/`.dSYM`, build
+    file trong Frameworks/Embed Frameworks/CopyFiles phase, Run Script phase copy+codesign
+    `LaunchAtLoginHelper`, và `FRAMEWORK_SEARCH_PATHS` trỏ `Carthage/Build/Mac`.
+  - Xóa `Carthage/`, `Cartfile`, `Cartfile.resolved` khỏi đĩa.
+  - Dọn `Vimac.xcworkspace/contents.xcworkspacedata`: bỏ tham chiếu `Pods/Pods.xcodeproj` (không
+    còn tồn tại) và 1 file-ref đường dẫn tuyệt đối trỏ máy tác giả gốc (`/Users/macintosh/...`,
+    rác từ lâu, không liên quan gì tới cấu trúc hiện tại).
+- ✅ **Nâng `MACOSX_DEPLOYMENT_TARGET` lên 13.0** (yêu cầu tối thiểu của `LaunchAtLogin-Modern`:
+  `.macOS(.v13)`) — từ 10.15 (Phase 1) lên thẳng 13.0, không dừng ở mức trung gian.
+- ✅ Warning `@_functionBuilder` (từ pod `Preferences` cũ) **tự động biến mất** sau khi chuyển sang
+  package `Settings` mới (code hiện đại, dùng `@resultBuilder` đúng chuẩn) — không cần sửa gì thêm.
+- ⬜ **Phát sinh, chưa làm**: RxSwift 6 deprecate `observeOn`/`subscribe(onSuccess:onError:...)` để
+  đổi tên thành `observe(on:)`/`subscribe(onSuccess:onFailure:...)` — build vẫn chạy tốt (chỉ là
+  warning), nhưng còn ~15 chỗ rải rác (`AppDelegate.swift`, `HintModeController.swift`,
+  `ScrollModeViewController.swift`...) nên dọn khi có dịp, không khẩn cấp.
 
 ## Phase 3 — Kiểm tra lại hành vi Accessibility trên macOS/trình duyệt hiện tại
 
@@ -142,9 +168,19 @@ toggle riêng cho Base Enterprise (xem Phase 3).
 
 ## Ghi chú vận hành (quan trọng khi tiếp tục dev)
 
-- Build: `pod install && carthage build` (không kèm `--use-xcframeworks`) rồi
+- Build: **không còn CocoaPods/Carthage** — mọi dependency đều qua SPM, Xcode tự resolve khi mở
+  `Vimac.xcworkspace` (hoặc `Vimac.xcodeproj` trực tiếp, workspace giờ chỉ còn 1 file-ref tới
+  xcodeproj). Chạy `xcodebuild -resolvePackageDependencies -workspace Vimac.xcworkspace -scheme Vimac`
+  nếu cần force resolve trước, rồi
   `xcodebuild -workspace Vimac.xcworkspace -scheme Vimac -configuration Debug -destination 'platform=macOS' -allowProvisioningUpdates build`,
-  hoặc mở `Vimac.xcworkspace` trong Xcode và Run trực tiếp.
+  hoặc mở trong Xcode và Run trực tiếp.
+- Sửa SPM package reference (thêm/đổi version) bằng cách chỉnh `Vimac.xcodeproj/project.pbxproj`
+  qua gem `xcodeproj` (đi kèm CocoaPods, dùng `GEM_HOME=/opt/homebrew/Cellar/cocoapods/<version>/libexec ruby ...`)
+  — an toàn hơn tự sửa tay pbxproj, và tránh cần mở Xcode GUI. Xem các script mẫu đã dùng trong
+  lịch sử session (thêm package, gỡ file reference + build phase của 1 framework cũ, đổi requirement
+  version).
+- App giờ yêu cầu tối thiểu **macOS 13** (Ventura) — không chạy được trên macOS cũ hơn nữa (đổi từ
+  10.14 ban đầu qua 2 bước: 10.15 ở Phase 1, 13.0 ở Phase 2).
 - Sau khi build xong lần đầu/đổi signing: cấp quyền Accessibility **thủ công** cho `Vimac.app` (và
   Xcode, nếu cần) qua System Settings → Privacy & Security → Accessibility — script tự động cũ đã
   hỏng vĩnh viễn trên macOS hiện tại (xem Phase 0, mục 8).
